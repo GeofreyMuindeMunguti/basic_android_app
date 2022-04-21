@@ -1,16 +1,22 @@
-package com.example.helloworld.fragments.list
+package com.example.helloworld
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.example.helloworld.R
 import com.example.helloworld.data.viewmodels.UserViewModel
+import com.example.helloworld.fragments.list.ListAdapter
+import com.example.helloworld.workers.SyncWorker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -50,10 +56,23 @@ class ListFragment : Fragment() {
             adapter.setData(users)
         }
 
+
+        mUserViewModel.getPost()
+        mUserViewModel.posts.observe(viewLifecycleOwner) {post ->
+            Toast.makeText(requireContext(), post.toString(), Toast.LENGTH_LONG).show()
+        }
+
         val floating_action_button = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
         floating_action_button.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
         }
+
+        syncPosts()
         return view
+    }
+
+    fun syncPosts(){
+        val sync_request: WorkRequest = OneTimeWorkRequestBuilder<SyncWorker>().build()
+        WorkManager.getInstance(requireContext()).enqueue(sync_request)
     }
 }

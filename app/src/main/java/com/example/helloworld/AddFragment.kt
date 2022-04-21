@@ -1,4 +1,4 @@
-package com.example.helloworld.fragments.add
+package com.example.helloworld
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
